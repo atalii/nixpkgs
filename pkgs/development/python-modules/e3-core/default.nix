@@ -4,6 +4,7 @@
 , coverage
 , distro
 , fetchFromGitHub
+, fetchpatch
 , httpretty
 , lib
 , mock
@@ -27,19 +28,20 @@
 
 buildPythonPackage rec {
   pname = "e3-core";
-  version = "22.4.0";
+  version = "22.5.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "AdaCore";
     repo = "e3-core";
     rev = "v${version}";
-    hash = "sha256-dgEk2/qRfAYwUz+e5TWKUy/aPLpmyWZ32OV1i7QM9Fs=";
+    hash = "sha256-7csZYohU89uavSMPOKGJ8HClmtiweGSghyR7QgFfSY8=";
   };
 
-  patches = [
-    ./0001-use-distro-over-ld.patch
-  ];
+  patches = [(fetchpatch {
+      url = "https://patch-diff.githubusercontent.com/raw/AdaCore/e3-core/pull/654.patch";
+      hash = "sha256-r9rSD3p9hums7+S+SGkNXz74wWxiNthMdFZ/0qv/LFg=";
+  })];
 
   nativeBuildInputs = [
     autoPatchelfHook
@@ -57,8 +59,7 @@ buildPythonPackage rec {
     tqdm
     stevedore
   ] ++ lib.optional stdenv.isLinux [
-    # See setup.py:24. These are required only on Linux. Darwin has its own set
-    # of requirements.
+    # These are required only on Linux. Darwin has its own set of requirements.
     psutil
     distro
   ];
